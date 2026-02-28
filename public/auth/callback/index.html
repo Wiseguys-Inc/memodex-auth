@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memodex — Email Confirmed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0ABFBC;
+      --teal-dark: #089A97;
+      --teal-glow: rgba(10, 191, 188, 0.18);
+      --bg: #080F10;
+      --surface: #0D1A1B;
+      --border: rgba(10, 191, 188, 0.15);
+      --text: #E8F4F4;
+      --muted: rgba(232, 244, 244, 0.45);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% -10%, rgba(10, 191, 188, 0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(10, 191, 188, 0.06) 0%, transparent 60%),
+        var(--bg);
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(10,191,188,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10,191,188,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: var(--teal);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-up linear infinite;
+    }
+    @keyframes float-up {
+      0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+    }
+
+    /* Main card */
+    .card-wrap {
+      position: relative; z-index: 10;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem 3.5rem;
+      max-width: 460px; width: 100%;
+      text-align: center;
+      box-shadow: 0 0 80px rgba(10, 191, 188, 0.08), 0 2px 40px rgba(0,0,0,0.6);
+      animation: card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Check icon */
+    .check-wrap {
+      width: 72px; height: 72px;
+      margin: 0 auto 2rem;
+      position: relative;
+      animation: check-in 0.5s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes check-in {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .check-ring {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--teal);
+      animation: pulse-ring 2s ease-out 0.8s infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .check-circle {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--teal-glow);
+      border: 1.5px solid var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .check-circle svg {
+      width: 28px; height: 28px;
+      stroke: var(--teal);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .check-path {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: draw-check 0.4s ease 0.6s forwards;
+    }
+    @keyframes draw-check {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Logo */
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fade-up 0.5s 0.4s ease forwards;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      animation: fade-up 0.5s 0.5s ease forwards;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fade-up 0.5s 0.6s ease forwards;
+    }
+
+    /* CTA button */
+    .btn {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      gap: 0.5rem;
+      background: var(--teal);
+      color: #060d0d;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.85rem 2rem;
+      border-radius: 100px;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(10, 191, 188, 0.25);
+      opacity: 0;
+      animation: fade-up 0.5s 0.75s ease forwards;
+      width: 100%;
+    }
+    .btn:hover {
+      background: var(--teal-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 0 32px rgba(10, 191, 188, 0.4);
+    }
+    .btn:active { transform: translateY(0); }
+
+    .divider {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 1.5rem 0;
+      opacity: 0;
+      animation: fade-up 0.5s 0.85s ease forwards;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+    .divider span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .appstore-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 400;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 100px;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+      opacity: 0;
+      animation: fade-up 0.5s 0.95s ease forwards;
+    }
+    .appstore-btn:hover {
+      border-color: rgba(10,191,188,0.4);
+      background: rgba(10,191,188,0.05);
+    }
+    .appstore-btn svg { width: 16px; height: 16px; fill: var(--text); }
+
+    .footnote {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      opacity: 0;
+      animation: fade-up 0.5s 1.05s ease forwards;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Status states */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(10,191,188,0.1);
+      border: 1px solid rgba(10,191,188,0.2);
+      border-radius: 100px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.7rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      animation: fade-up 0.5s 0.35s ease forwards;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      background: var(--teal);
+      border-radius: 50%;
+      animation: blink 1.5s ease infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
+
+<div class="card-wrap">
+  <div class="card">
+
+    <div class="check-wrap">
+      <div class="check-ring"></div>
+      <div class="check-circle">
+        <svg viewBox="0 0 24 24">
+          <polyline class="check-path" points="4,12 9,17 20,6" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="logo">Memodex</div>
+    <div class="status-badge"><div class="dot"></div> Email Verified</div>
+
+    <h1>You're all set.</h1>
+    <p class="subtitle">
+      Your email has been confirmed.<br/>
+      Open Memodex on your iPhone to start building your second brain.
+    </p>
+
+    <a href="#" class="btn" id="open-app-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+      Open in Memodex
+    </a>
+
+    <div class="divider"><span>or</span></div>
+
+    <a href="https://apps.apple.com/app/memodex" class="appstore-btn" id="appstore-link">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      Download on the App Store
+    </a>
+
+    <p class="footnote">
+      Didn't sign up? You can safely ignore this page.
+    </p>
+
+  </div>
+</div>
+
+<script>
+  // Generate particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = p.style.height = (Math.random() > 0.5 ? 2 : 3) + 'px';
+    container.appendChild(p);
+  }
+
+  // Extract token params from URL and build deep link
+  const params = window.location.search + window.location.hash;
+  const appUrl = 'memodex://auth/callback' + params;
+
+  document.getElementById('open-app-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = appUrl;
+
+    // If still here after 2s, they're probably on desktop
+    setTimeout(() => {
+      document.getElementById('open-app-btn').textContent = '📱 Open on your iPhone';
+    }, 2000);
+  });
+
+  // Auto-attempt redirect on mobile
+  const isMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    setTimeout(() => { window.location.href = appUrl; }, 800);
+  }
+</script>
+
+</body>
+</html>
