@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* Animated background */
     .bg-layer {
       position: fixed; inset: 0; z-index: 0;
       background:
@@ -45,7 +44,6 @@
       mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
     }
 
-    /* Floating particles */
     .particles {
       position: fixed; inset: 0; z-index: 0; overflow: hidden;
     }
@@ -64,7 +62,6 @@
       100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
     }
 
-    /* Main card */
     .card-wrap {
       position: relative; z-index: 10;
       min-height: 100vh;
@@ -87,7 +84,6 @@
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Check icon */
     .check-wrap {
       width: 72px; height: 72px;
       margin: 0 auto 2rem;
@@ -133,7 +129,6 @@
       to { stroke-dashoffset: 0; }
     }
 
-    /* Logo */
     .logo {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -166,7 +161,6 @@
       animation: fade-up 0.5s 0.6s ease forwards;
     }
 
-    /* CTA button */
     .btn {
       display: inline-flex;
       align-items: center; justify-content: center;
@@ -247,7 +241,6 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Status states */
     .status-badge {
       display: inline-flex; align-items: center; gap: 0.4rem;
       background: rgba(10,191,188,0.1);
@@ -340,23 +333,27 @@
     container.appendChild(p);
   }
 
-  // Extract token params from URL and build deep link
-  const params = window.location.search + window.location.hash;
-  const appUrl = 'memodex://auth/callback' + params;
+  // Supabase puts tokens in the hash fragment: #access_token=xxx&refresh_token=yyy&type=signup
+  // We forward the entire hash to the memodex:// deep link so the iOS app can complete the session
+  const hash = window.location.hash;
+  const appUrl = 'memodex://auth/callback' + hash;
 
-  document.getElementById('open-app-btn').addEventListener('click', (e) => {
+  // Set the button href directly so it works even without the click handler
+  const btn = document.getElementById('open-app-btn');
+  btn.href = appUrl;
+
+  btn.addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = appUrl;
-
-    // If still here after 2s, they're probably on desktop
+    // If still here after 2s, user is probably on desktop
     setTimeout(() => {
-      document.getElementById('open-app-btn').textContent = '📱 Open on your iPhone';
+      btn.innerHTML = '📱 Open on your iPhone';
     }, 2000);
   });
 
-  // Auto-attempt redirect on mobile
+  // Auto-redirect on iOS if tokens are present in the hash
   const isMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile) {
+  if (isMobile && hash.includes('access_token')) {
     setTimeout(() => { window.location.href = appUrl; }, 800);
   }
 </script>
